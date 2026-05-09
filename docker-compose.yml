@@ -1,0 +1,93 @@
+services:
+  frontend_youtube_free_anime:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    container_name: frontend_youtube_free_anime
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "3001:3000"
+    depends_on:
+      - backend_youtube_free_anime
+    user: "1000:1000"
+    networks:
+      - youtube_free_anime_network
+
+  backend_youtube_free_anime:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    container_name: backend_youtube_free_anime
+    volumes:
+      - ./backend:/var/www
+    depends_on:
+      - db_youtube_free_anime
+    user: "1000:1000"
+    networks:
+      - youtube_free_anime_network
+
+  python_youtube_free_anime:
+    build:
+      context: .
+      dockerfile: docker/python/Dockerfile
+    container_name: python_youtube_free_anime
+    working_dir: /app
+    volumes:
+      - ./python:/app
+    depends_on:
+      - db_youtube_free_anime
+      - backend_youtube_free_anime
+    environment:
+      APP_ENV: local
+
+      # PostgreSQL
+      DB_HOST: db_youtube_free_anime
+      DB_PORT: 5432
+      DB_DATABASE: youtube_free_anime_db
+      DB_USERNAME: youtube_free_anime_user
+      DB_PASSWORD: youtube_free_anime_pass
+
+      # Laravel API
+      LARAVEL_API_URL: http://backend_youtube_free_anime
+
+    user: "1000:1000"
+    tty: true
+    restart: unless-stopped
+    networks:
+      - youtube_free_anime_network
+
+  db_youtube_free_anime:
+    image: postgres:16
+    container_name: db_youtube_free_anime
+    environment:
+      POSTGRES_DB: youtube_free_anime_db
+      POSTGRES_USER: youtube_free_anime_user
+      POSTGRES_PASSWORD: youtube_free_anime_pass
+    volumes:
+      - db_youtube_free_anime_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    networks:
+      - youtube_free_anime_network
+
+  nginx_youtube_free_anime:
+    image: nginx:1.29
+    container_name: nginx_youtube_free_anime
+    ports:
+      - "81:80"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./backend/public:/var/www/public
+    depends_on:
+      - frontend_youtube_free_anime
+      - backend_youtube_free_anime
+    networks:
+      - youtube_free_anime_network
+
+volumes:
+  db_youtube_free_anime_data:
+
+networks:
+  youtube_free_anime_network:
+    driver: bridge

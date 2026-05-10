@@ -7,15 +7,15 @@ RSS エントリを Laravel API 送信用 dict に変換するパーサー
 """
 
 import re
+import logging
 
 from services.normalizer import normalize_title
 from services.gemini_parser import extract_video_info
 
+logger = logging.getLogger(__name__)
+
 # ---------------------------------------------------------------------------
 # チルダ系文字をまとめて扱う正規表現パターン
-# U+007E : ~   ASCII チルダ
-# U+301C : 〜  波ダッシュ
-# U+FF5E : ～  全角チルダ（YouTube タイトルで最も多い）
 # ---------------------------------------------------------------------------
 _TILDE = r"[~〜～]"
 
@@ -104,24 +104,9 @@ def _extract_tags(title: str) -> list[str]:
 
 def parse_video(entry: dict) -> dict:
     """
-    RSS エントリ（rss_fetcher が返す dict）を
-    Laravel API 送信用の dict に変換する
-
-    正規表現で取れなかった項目・free_until_at は
-    Gemini API（gemini_parser）に問い合わせて補完する。
-
-    Parameters
-    ----------
-    entry : dict
-        fetch_youtube_rss() が返すリストの各要素
-
-    Returns
-    -------
-    dict
-        db.upsert_video / db.bulk_sync に渡せる形式
+    RSS エントリを Laravel API 送信用 dict に変換する
     """
     title: str = entry.get("title", "")
-    ip_title : str = ''
     description: str = entry.get("description", "")
 
     normalized_title = normalize_title(title)
@@ -129,7 +114,7 @@ def parse_video(entry: dict) -> dict:
 
     # --- 正規表現で抽出できる情報 ---
     video_type = _determine_video_type(title)
-    season_number = _extract_season_number(title)  # None の場合は Gemini で補完
+    season_number = _extract_season_number(title)
 
     episode_number: int | None = None
     episode_start: int | None = None
@@ -140,21 +125,19 @@ def parse_video(entry: dict) -> dict:
     elif video_type == "episode":
         episode_number = _extract_episode_number(title)
 
-
-
-    free_until_at: str | None = None
-
-
+    # --- Gemini API に問い合わせ ---
     gemini_result = extract_video_info(title, description)
 
     ip_title = gemini_result.get("ip_title", "")
-    # 正規表現が取れていれば Gemini 結果で上書きしない
+    
+    # 正規表現で取れなかった場合のみ Gemini の結果を採用
     if episode_start is None:
         episode_start = gemini_result.get("episode_start")
     if episode_end is None:
         episode_end = gemini_result.get("episode_end")
     if episode_number is None and video_type == "episode":
         episode_number = gemini_result.get("episode_number")
+    
     if season_number is None:
         season_number = gemini_result.get("season_number") or 1
 
@@ -164,10 +147,11 @@ def parse_video(entry: dict) -> dict:
     if video_type == "other":
         video_type = gemini_result.get("video_type", "other")
 
-    # season_number の最終フォールバック
+    # 最終フォールバック
     if season_number is None:
         season_number = 1
 
+    # チャンネルIDの取得とURL生成
     youtube_channel_id: str = entry.get("youtube_channel_id", "")
     channel_url = (
         f"https://www.youtube.com/channel/{youtube_channel_id}"
@@ -180,7 +164,7 @@ def parse_video(entry: dict) -> dict:
         "youtube_video_id": entry.get("youtube_video_id"),
         "youtube_channel_id": youtube_channel_id,
 
-        # --- チャンネル情報（bulk_sync 用） ---
+        # --- チャンネル情報 ---
         "channel_name": entry.get("channel_name"),
         "channel_url": channel_url,
 

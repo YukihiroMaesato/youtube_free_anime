@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Internal\VideoController as InternalVideoController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -10,3 +11,12 @@ Route::get('/user', function (Request $request) {
 Route::get('/health', function () {
     return response()->json(['status' => 'ok eee']);
 });
+
+Route::middleware('internal.token')
+    ->prefix('internal')
+    ->group(function () {
+
+        Route::get('/videos/showMany', [InternalVideoController::class, 'showMany']);
+
+        Route::post('/videos/bulk-store', [InternalVideoController::class, 'bulkStore']);
+    });

@@ -38,18 +38,6 @@ services:
     depends_on:
       - db_youtube_free_anime
       - backend_youtube_free_anime
-    environment:
-      APP_ENV: local
-
-      # PostgreSQL
-      DB_HOST: db_youtube_free_anime
-      DB_PORT: 5432
-      DB_DATABASE: youtube_free_anime_db
-      DB_USERNAME: youtube_free_anime_user
-      DB_PASSWORD: youtube_free_anime_pass
-
-      # Laravel API
-      LARAVEL_API_URL: http://backend_youtube_free_anime
 
     user: "1000:1000"
     tty: true

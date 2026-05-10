@@ -4,3 +4,5 @@ beautifulsoup4
 psycopg2-binary
 sqlalchemy
 python-dotenv
+google-generativeai
+google-genai

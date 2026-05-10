@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN useradd -m appuser
 
-COPY ./docker/python/requirements.txt /app/requirements.txt
+COPY ./python/requirements.txt /app/requirements.txt
 
 RUN pip install --no-cache-dir -r requirements.txt
 

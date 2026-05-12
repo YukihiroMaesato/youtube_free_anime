@@ -73,6 +73,7 @@ function getTitleGroup(title: AnimeTitle) {
 
 export default function TitlesPage() {
   const [titles, setTitles] = useState<AnimeTitle[]>([]);
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -107,15 +108,13 @@ export default function TitlesPage() {
   }, [titles]);
 
   const activeGroups = GROUPS.filter((group) => groupedTitles[group]?.length);
+  const visibleGroups = selectedGroup ? activeGroups.filter((group) => group === selectedGroup) : activeGroups;
 
   return (
     <main className="min-h-screen bg-white px-5 py-8 text-neutral-950 sm:px-8">
       <div className="mx-auto max-w-6xl">
         <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">タイトル一覧</h1>
-            <p className="mt-2 text-sm text-neutral-600">タイトルを選ぶと動画一覧へ戻ります。</p>
-          </div>
+          <h1 className="text-2xl font-bold">タイトル一覧</h1>
           <Link className="w-fit border border-neutral-300 px-3 py-2 text-sm text-neutral-700" href="/">
             動画一覧へ戻る
           </Link>
@@ -135,20 +134,36 @@ export default function TitlesPage() {
 
         {activeGroups.length > 0 && (
           <nav className="sticky top-0 z-10 mb-8 flex flex-wrap gap-2 border-b border-neutral-200 bg-white py-3">
+            <button
+              type="button"
+              className={`border px-3 py-2 text-sm ${
+                selectedGroup === null
+                  ? 'border-neutral-900 bg-neutral-900 text-white'
+                  : 'border-neutral-300 text-neutral-700 hover:border-neutral-900 hover:text-neutral-950'
+              }`}
+              onClick={() => setSelectedGroup(null)}
+            >
+              すべて
+            </button>
             {activeGroups.map((group) => (
-              <a
+              <button
                 key={group}
-                className="border border-neutral-300 px-3 py-2 text-sm text-neutral-700 hover:border-neutral-900 hover:text-neutral-950"
-                href={`#${group}`}
+                type="button"
+                className={`border px-3 py-2 text-sm ${
+                  selectedGroup === group
+                    ? 'border-neutral-900 bg-neutral-900 text-white'
+                    : 'border-neutral-300 text-neutral-700 hover:border-neutral-900 hover:text-neutral-950'
+                }`}
+                onClick={() => setSelectedGroup(group)}
               >
                 {group}
-              </a>
+              </button>
             ))}
           </nav>
         )}
 
         <div className="space-y-10">
-          {activeGroups.map((group) => (
+          {visibleGroups.map((group) => (
             <section key={group} id={group} className="scroll-mt-20">
               <h2 className="mb-4 border-b border-neutral-200 pb-2 text-xl font-semibold">{group}</h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

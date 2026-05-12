@@ -129,6 +129,7 @@ def parse_video(entry: dict) -> dict:
     gemini_result = extract_video_info(title, description)
 
     ip_title = gemini_result.get("ip_title", "")
+    ip_title_kana = gemini_result.get("ip_title_kana")
     
     # 正規表現で取れなかった場合のみ Gemini の結果を採用
     if episode_start is None:
@@ -171,6 +172,7 @@ def parse_video(entry: dict) -> dict:
         # --- 動画情報 ---
         "title": title,
         "ip_title": ip_title,
+        "ip_title_kana": ip_title_kana,
         "normalized_title": normalized_title,
         "description": description,
         "thumbnail_url": entry.get("thumbnail_url"),

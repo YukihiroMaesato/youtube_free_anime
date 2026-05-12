@@ -90,7 +90,7 @@ class VideoController extends Controller
                         ->orWhere('title_en', 'like', "%{$keyword}%");
                 });
             })
-            ->orderBy('title')
+            ->orderByRaw('COALESCE(title_kana, title)')
             ->when($limit !== null, function ($query) use ($limit) {
                 $query->limit($limit);
             })

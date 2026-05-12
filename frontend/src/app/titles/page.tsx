@@ -38,7 +38,7 @@ function toHiragana(value: string) {
 }
 
 function getTitleGroup(title: AnimeTitle) {
-  const source = toHiragana((title.title_kana || title.title_en || title.title).trim());
+  const source = toHiragana((title.title_kana || title.title).trim());
   const first = source.charAt(0).toUpperCase();
 
   if ('あいうえお'.includes(first)) return 'あ行';
@@ -51,6 +51,16 @@ function getTitleGroup(title: AnimeTitle) {
   if ('やゆよ'.includes(first)) return 'や行';
   if ('らりるれろ'.includes(first)) return 'ら行';
   if ('わをん'.includes(first)) return 'わ行';
+
+  const englishFirst = (title.title_en || title.title).trim().charAt(0).toUpperCase();
+
+  if (englishFirst >= 'A' && englishFirst <= 'D') return 'A-D';
+  if (englishFirst >= 'E' && englishFirst <= 'H') return 'E-H';
+  if (englishFirst >= 'I' && englishFirst <= 'L') return 'I-L';
+  if (englishFirst >= 'M' && englishFirst <= 'P') return 'M-P';
+  if (englishFirst >= 'Q' && englishFirst <= 'T') return 'Q-T';
+  if (englishFirst >= 'U' && englishFirst <= 'Z') return 'U-Z';
+
   if (first >= 'A' && first <= 'D') return 'A-D';
   if (first >= 'E' && first <= 'H') return 'E-H';
   if (first >= 'I' && first <= 'L') return 'I-L';

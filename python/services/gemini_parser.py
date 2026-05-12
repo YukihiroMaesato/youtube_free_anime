@@ -72,6 +72,11 @@ YouTube の動画タイトルと説明文から、指定された JSON 形式で
                              → "彼女が公爵邸に行った理由"
                       3. チャンネル名がそのまま作品名である場合はそれを使う
                     判別できない場合は null
+- ip_title_kana   : ip_title の読みをひらがなで返す。
+                    ip_title が null の場合は null。
+                    英字タイトルなど一般的にカナ表記しない作品名は null。
+                    例: "妖怪ウォッチ" → "ようかいうぉっち"
+                        "彼女が公爵邸に行った理由" → "かのじょがこうしゃくていにいったりゆう"
 
 ## ルール
 - 期限の年が不明な場合、現在の日付 {today} を基準に補完してください（過去の日付にならないよう注意）。
@@ -92,6 +97,7 @@ def _default_result() -> dict:
         "video_type":     "other",
         "free_until_at":  None,
         "ip_title":       None,
+        "ip_title_kana":  None,
     }
 
 
@@ -116,6 +122,7 @@ def _call_api(user_message: str, system_prompt: str) -> dict:
         result["season_number"] = 1
 
     result.setdefault("ip_title", None)
+    result.setdefault("ip_title_kana", None)
 
     return result
 

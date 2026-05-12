@@ -103,6 +103,13 @@ class VideoController extends Controller
                                 'normalized_title' => $data['ip_title'],
                             ]
                         );
+
+                        if (!empty($data['ip_title_kana']) && empty($animeTitle->title_kana)) {
+                            $animeTitle->update([
+                                'title_kana' => $data['ip_title_kana'],
+                            ]);
+                        }
+
                         $animeTitleId = $animeTitle->id;
                     }
 

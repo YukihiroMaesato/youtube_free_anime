@@ -76,6 +76,7 @@ class VideoController extends Controller
     {
         $validated = $request->validated();
         $keyword = trim((string) ($validated['q'] ?? ''));
+        $limit = !empty($validated['all']) ? null : 20;
 
         $titles = AnimeTitle::query()
             ->withCount('videos')
@@ -90,12 +91,16 @@ class VideoController extends Controller
                 });
             })
             ->orderBy('title')
-            ->limit(20)
-            ->get(['id', 'title'])
+            ->when($limit !== null, function ($query) use ($limit) {
+                $query->limit($limit);
+            })
+            ->get(['id', 'title', 'title_kana', 'title_en'])
             ->map(function (AnimeTitle $title) {
                 return [
                     'id' => $title->id,
                     'title' => $title->title,
+                    'title_kana' => $title->title_kana,
+                    'title_en' => $title->title_en,
                     'videos_count' => $title->videos_count,
                 ];
             });

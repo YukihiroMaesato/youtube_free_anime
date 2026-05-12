@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 
@@ -38,6 +39,8 @@ type Tag = {
 type AnimeTitleOption = {
   id: number;
   title: string;
+  title_kana?: string | null;
+  title_en?: string | null;
   videos_count: number;
 };
 
@@ -63,6 +66,26 @@ function getEpisodeLabel(video: Video) {
   }
 
   return video.video_type;
+}
+
+function getInitialSelectedTitle() {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const id = Number(params.get('anime_title_id'));
+  const title = params.get('title');
+
+  if (!id || !title) {
+    return null;
+  }
+
+  return {
+    id,
+    title,
+    videos_count: 0,
+  };
 }
 
 function Pagination({
@@ -114,8 +137,8 @@ export default function Home() {
   const [tags, setTags] = useState<Tag[]>([]);
   const [titleOptions, setTitleOptions] = useState<AnimeTitleOption[]>([]);
   const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
-  const [selectedTitle, setSelectedTitle] = useState<AnimeTitleOption | null>(null);
-  const [titleSearch, setTitleSearch] = useState('');
+  const [selectedTitle, setSelectedTitle] = useState<AnimeTitleOption | null>(getInitialSelectedTitle);
+  const [titleSearch, setTitleSearch] = useState(() => getInitialSelectedTitle()?.title ?? '');
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -211,6 +234,10 @@ export default function Home() {
     setSelectedTitle(title);
     setTitleSearch(title?.title ?? '');
     setPage(1);
+
+    if (!title && typeof window !== 'undefined') {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
   }
 
   return (
@@ -218,7 +245,12 @@ export default function Home() {
       <div className="mx-auto max-w-6xl">
         <header className="mb-8 space-y-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <h1 className="text-3xl font-bold">無料公開中アニメ</h1>
+            <div className="flex flex-col gap-3">
+              <h1 className="text-3xl font-bold">無料公開中アニメ</h1>
+              <Link className="w-fit border border-neutral-300 px-3 py-2 text-sm text-neutral-700" href="/titles">
+                タイトル一覧
+              </Link>
+            </div>
 
             <div className="flex max-w-3xl flex-wrap gap-2">
               <button
@@ -249,7 +281,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="max-w-xl">
+          <div className="relative max-w-xl">
             <label className="block text-sm font-medium text-neutral-700" htmlFor="anime-title-search">
               タイトル
             </label>
@@ -280,7 +312,7 @@ export default function Home() {
             </div>
 
             {titleSearch.trim() !== '' && titleOptions.length > 0 && !selectedTitle && (
-              <div className="mt-2 max-h-72 overflow-y-auto border border-neutral-200 bg-white">
+              <div className="absolute left-0 right-0 top-full z-20 mt-2 max-h-72 overflow-y-auto border border-neutral-200 bg-white shadow-lg">
                 {titleOptions.map((title) => (
                   <button
                     key={title.id}

@@ -15,6 +15,7 @@ class VideoTitleIndexRequest extends FormRequest
     {
         return [
             'q' => ['sometimes', 'string', 'max:100'],
+            'all' => ['sometimes', 'boolean'],
         ];
     }
 }

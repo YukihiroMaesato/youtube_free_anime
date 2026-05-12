@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\VideoController;
 use App\Http\Controllers\Internal\VideoController as InternalVideoController;
 
 Route::get('/user', function (Request $request) {
@@ -11,6 +12,8 @@ Route::get('/user', function (Request $request) {
 Route::get('/health', function () {
     return response()->json(['status' => 'ok eee']);
 });
+
+Route::get('/videos', [VideoController::class, 'index']);
 
 Route::middleware('internal.token')
     ->prefix('internal')

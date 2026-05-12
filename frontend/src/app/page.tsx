@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
@@ -66,6 +66,97 @@ function getEpisodeLabel(video: Video) {
   }
 
   return video.video_type;
+}
+
+function stopYoutubeVideo(iframe: HTMLIFrameElement | null) {
+  iframe?.contentWindow?.postMessage(
+    JSON.stringify({
+      event: 'command',
+      func: 'stopVideo',
+      args: [],
+    }),
+    'https://www.youtube.com'
+  );
+}
+
+function stopAllYoutubeVideos() {
+  document
+    .querySelectorAll<HTMLIFrameElement>('iframe[data-youtube-player="true"]')
+    .forEach((iframe) => stopYoutubeVideo(iframe));
+}
+
+function VideoCard({ video }: { video: Video }) {
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const episodeLabel = getEpisodeLabel(video);
+  const publishedAt = formatDate(video.published_at);
+  const freeUntilAt = formatDate(video.free_until_at);
+
+  useEffect(() => {
+    const iframe = iframeRef.current;
+
+    if (!iframe) {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          stopYoutubeVideo(iframe);
+        }
+      },
+      {
+        threshold: 0.1,
+      }
+    );
+
+    observer.observe(iframe);
+
+    return () => {
+      stopYoutubeVideo(iframe);
+      observer.disconnect();
+    };
+  }, []);
+
+  return (
+    <article className="overflow-hidden border border-neutral-200 bg-white">
+      <div className="aspect-video w-full bg-neutral-100">
+        <iframe
+          ref={iframeRef}
+          className="h-full w-full"
+          src={`https://www.youtube.com/embed/${video.youtube_video_id}?enablejsapi=1`}
+          title={video.title}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          data-youtube-player="true"
+        />
+      </div>
+
+      <div className="space-y-3 p-4">
+        <div>
+          <h2 className="line-clamp-2 text-base font-semibold leading-6">{video.title}</h2>
+          {video.anime_title && (
+            <p className="mt-1 text-sm text-neutral-600">{video.anime_title}</p>
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-2 text-xs text-neutral-600">
+          {episodeLabel && (
+            <span className="border border-neutral-200 px-2 py-1">{episodeLabel}</span>
+          )}
+          {publishedAt && (
+            <span className="border border-neutral-200 px-2 py-1">公開日 {publishedAt}</span>
+          )}
+          {freeUntilAt && (
+            <span className="border border-neutral-200 px-2 py-1">無料期限 {freeUntilAt}</span>
+          )}
+        </div>
+
+        {video.channel_title && (
+          <p className="text-xs text-neutral-500">{video.channel_title}</p>
+        )}
+      </div>
+    </article>
+  );
 }
 
 function Pagination({
@@ -191,6 +282,7 @@ export default function Home() {
       return;
     }
 
+    stopAllYoutubeVideos();
     setIsLoading(true);
 
     const params = new URLSearchParams({
@@ -229,11 +321,13 @@ export default function Home() {
   }, [page, selectedTagId, selectedTitle, isUrlFilterReady]);
 
   function selectTag(tagId: number | null) {
+    stopAllYoutubeVideos();
     setSelectedTagId(tagId);
     setPage(1);
   }
 
   function selectTitle(title: AnimeTitleOption | null) {
+    stopAllYoutubeVideos();
     setSelectedTitle(title);
     setTitleSearch(title?.title ?? '');
     setPage(1);
@@ -249,7 +343,7 @@ export default function Home() {
         <header className="mb-8 space-y-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="flex flex-col gap-3">
-              <h1 className="text-3xl font-bold">無料公開中アニメ</h1>
+              <h1 className="text-3xl font-bold">推しアニ見っけ！</h1>
             </div>
 
             <div className="flex max-w-3xl flex-wrap gap-2">
@@ -360,50 +454,9 @@ export default function Home() {
         )}
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {videos.map((video) => {
-            const episodeLabel = getEpisodeLabel(video);
-            const publishedAt = formatDate(video.published_at);
-            const freeUntilAt = formatDate(video.free_until_at);
-
-            return (
-              <article key={video.id} className="overflow-hidden border border-neutral-200 bg-white">
-                <div className="aspect-video w-full bg-neutral-100">
-                  <iframe
-                    className="h-full w-full"
-                    src={`https://www.youtube.com/embed/${video.youtube_video_id}`}
-                    title={video.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                  />
-                </div>
-
-                <div className="space-y-3 p-4">
-                  <div>
-                    <h2 className="line-clamp-2 text-base font-semibold leading-6">{video.title}</h2>
-                    {video.anime_title && (
-                      <p className="mt-1 text-sm text-neutral-600">{video.anime_title}</p>
-                    )}
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 text-xs text-neutral-600">
-                    {episodeLabel && (
-                      <span className="border border-neutral-200 px-2 py-1">{episodeLabel}</span>
-                    )}
-                    {publishedAt && (
-                      <span className="border border-neutral-200 px-2 py-1">公開日 {publishedAt}</span>
-                    )}
-                    {freeUntilAt && (
-                      <span className="border border-neutral-200 px-2 py-1">無料期限 {freeUntilAt}</span>
-                    )}
-                  </div>
-
-                  {video.channel_title && (
-                    <p className="text-xs text-neutral-500">{video.channel_title}</p>
-                  )}
-                </div>
-              </article>
-            );
-          })}
+          {videos.map((video) => (
+            <VideoCard key={video.id} video={video} />
+          ))}
         </div>
 
         {!isLoading && !errorMessage && pagination && (

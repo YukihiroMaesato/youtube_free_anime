@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\VideoIndexRequest;
+use App\Http\Requests\VideoTitleIndexRequest;
+use App\Models\AnimeTitle;
+use App\Models\Tag;
 use App\Models\Video;
 use Illuminate\Http\JsonResponse;
 
@@ -17,6 +20,16 @@ class VideoController extends Controller
 
         if (!empty($validated['video_type'])) {
             $query->where('video_type', $validated['video_type']);
+        }
+
+        if (!empty($validated['tag_id'])) {
+            $query->whereHas('tags', function ($tagQuery) use ($validated) {
+                $tagQuery->where('tags.id', $validated['tag_id']);
+            });
+        }
+
+        if (!empty($validated['anime_title_id'])) {
+            $query->where('anime_title_id', $validated['anime_title_id']);
         }
 
         $videos = $query->paginate(30)
@@ -39,5 +52,54 @@ class VideoController extends Controller
             });
 
         return response()->json($videos);
+    }
+
+    public function tags(): JsonResponse
+    {
+        $tags = Tag::query()
+            ->withCount('videos')
+            ->has('videos')
+            ->orderBy('name')
+            ->get(['id', 'name'])
+            ->map(function (Tag $tag) {
+                return [
+                    'id' => $tag->id,
+                    'name' => $tag->name,
+                    'videos_count' => $tag->videos_count,
+                ];
+            });
+
+        return response()->json($tags);
+    }
+
+    public function titles(VideoTitleIndexRequest $request): JsonResponse
+    {
+        $validated = $request->validated();
+        $keyword = trim((string) ($validated['q'] ?? ''));
+
+        $titles = AnimeTitle::query()
+            ->withCount('videos')
+            ->has('videos')
+            ->when($keyword !== '', function ($query) use ($keyword) {
+                $query->where(function ($titleQuery) use ($keyword) {
+                    $titleQuery
+                        ->where('title', 'like', "%{$keyword}%")
+                        ->orWhere('normalized_title', 'like', "%{$keyword}%")
+                        ->orWhere('title_kana', 'like', "%{$keyword}%")
+                        ->orWhere('title_en', 'like', "%{$keyword}%");
+                });
+            })
+            ->orderBy('title')
+            ->limit(20)
+            ->get(['id', 'title'])
+            ->map(function (AnimeTitle $title) {
+                return [
+                    'id' => $title->id,
+                    'title' => $title->title,
+                    'videos_count' => $title->videos_count,
+                ];
+            });
+
+        return response()->json($titles);
     }
 }

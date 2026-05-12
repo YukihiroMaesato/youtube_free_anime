@@ -29,6 +29,18 @@ type PaginatedVideos = {
   to: number | null;
 };
 
+type Tag = {
+  id: number;
+  name: string;
+  videos_count: number;
+};
+
+type AnimeTitleOption = {
+  id: number;
+  title: string;
+  videos_count: number;
+};
+
 function formatDate(value: string | null) {
   if (!value) {
     return null;
@@ -99,14 +111,75 @@ function Pagination({
 export default function Home() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [pagination, setPagination] = useState<PaginatedVideos | null>(null);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [titleOptions, setTitleOptions] = useState<AnimeTitleOption[]>([]);
+  const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
+  const [selectedTitle, setSelectedTitle] = useState<AnimeTitleOption | null>(null);
+  const [titleSearch, setTitleSearch] = useState('');
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    fetch(`${API_URL}/api/videos/tags`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('タグの取得に失敗しました');
+        }
+
+        return res.json();
+      })
+      .then((data: Tag[]) => {
+        setTags(data);
+      })
+      .catch(() => {
+        setTags([]);
+      });
+  }, []);
+
+  useEffect(() => {
+    const timerId = window.setTimeout(() => {
+      const params = new URLSearchParams();
+
+      if (titleSearch.trim() !== '') {
+        params.set('q', titleSearch.trim());
+      }
+
+      fetch(`${API_URL}/api/videos/titles?${params.toString()}`)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error('タイトル候補の取得に失敗しました');
+          }
+
+          return res.json();
+        })
+        .then((data: AnimeTitleOption[]) => {
+          setTitleOptions(data);
+        })
+        .catch(() => {
+          setTitleOptions([]);
+        });
+    }, 250);
+
+    return () => window.clearTimeout(timerId);
+  }, [titleSearch]);
+
+  useEffect(() => {
     setIsLoading(true);
 
-    fetch(`${API_URL}/api/videos?page=${page}`)
+    const params = new URLSearchParams({
+      page: String(page),
+    });
+
+    if (selectedTagId) {
+      params.set('tag_id', String(selectedTagId));
+    }
+
+    if (selectedTitle) {
+      params.set('anime_title_id', String(selectedTitle.id));
+    }
+
+    fetch(`${API_URL}/api/videos?${params.toString()}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error('動画データの取得に失敗しました');
@@ -127,13 +200,107 @@ export default function Home() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [page]);
+  }, [page, selectedTagId, selectedTitle]);
+
+  function selectTag(tagId: number | null) {
+    setSelectedTagId(tagId);
+    setPage(1);
+  }
+
+  function selectTitle(title: AnimeTitleOption | null) {
+    setSelectedTitle(title);
+    setTitleSearch(title?.title ?? '');
+    setPage(1);
+  }
 
   return (
     <main className="min-h-screen bg-white px-5 py-8 text-neutral-950 sm:px-8">
       <div className="mx-auto max-w-6xl">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold">無料公開中アニメ</h1>
+        <header className="mb-8 space-y-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <h1 className="text-3xl font-bold">無料公開中アニメ</h1>
+
+            <div className="flex max-w-3xl flex-wrap gap-2">
+              <button
+                type="button"
+                className={`border px-3 py-2 text-sm ${
+                  selectedTagId === null
+                    ? 'border-neutral-900 bg-neutral-900 text-white'
+                    : 'border-neutral-300 text-neutral-700'
+                }`}
+                onClick={() => selectTag(null)}
+              >
+                すべて
+              </button>
+              {tags.map((tag) => (
+                <button
+                  key={tag.id}
+                  type="button"
+                  className={`border px-3 py-2 text-sm ${
+                    selectedTagId === tag.id
+                      ? 'border-neutral-900 bg-neutral-900 text-white'
+                      : 'border-neutral-300 text-neutral-700'
+                  }`}
+                  onClick={() => selectTag(tag.id)}
+                >
+                  {tag.name} ({tag.videos_count})
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="max-w-xl">
+            <label className="block text-sm font-medium text-neutral-700" htmlFor="anime-title-search">
+              タイトル
+            </label>
+            <div className="mt-2 flex gap-2">
+              <input
+                id="anime-title-search"
+                className="min-w-0 flex-1 border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+                type="search"
+                value={titleSearch}
+                placeholder="タイトルを検索"
+                onChange={(event) => {
+                  setTitleSearch(event.target.value);
+                  if (selectedTitle) {
+                    setSelectedTitle(null);
+                    setPage(1);
+                  }
+                }}
+              />
+              {selectedTitle && (
+                <button
+                  type="button"
+                  className="border border-neutral-300 px-3 py-2 text-sm text-neutral-700"
+                  onClick={() => selectTitle(null)}
+                >
+                  解除
+                </button>
+              )}
+            </div>
+
+            {titleSearch.trim() !== '' && titleOptions.length > 0 && !selectedTitle && (
+              <div className="mt-2 max-h-72 overflow-y-auto border border-neutral-200 bg-white">
+                {titleOptions.map((title) => (
+                  <button
+                    key={title.id}
+                    type="button"
+                    className="flex w-full items-center justify-between gap-4 px-3 py-2 text-left text-sm hover:bg-neutral-50"
+                    onClick={() => selectTitle(title)}
+                  >
+                    <span>{title.title}</span>
+                    <span className="shrink-0 text-xs text-neutral-500">{title.videos_count}件</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {selectedTitle && (
+              <p className="mt-2 text-sm text-neutral-600">
+                {selectedTitle.title} で絞り込み中
+              </p>
+            )}
+          </div>
         </header>
 
         {isLoading && <p className="text-neutral-600">動画を読み込み中です。</p>}

@@ -14,6 +14,8 @@ Route::get('/health', function () {
 });
 
 Route::get('/videos', [VideoController::class, 'index']);
+Route::get('/videos/tags', [VideoController::class, 'tags']);
+Route::get('/videos/titles', [VideoController::class, 'titles']);
 
 Route::middleware('internal.token')
     ->prefix('internal')

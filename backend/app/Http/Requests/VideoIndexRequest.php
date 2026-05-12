@@ -15,6 +15,8 @@ class VideoIndexRequest extends FormRequest
     {
         return [
             'page' => ['sometimes', 'integer', 'min:1'],
+            'tag_id' => ['sometimes', 'integer', 'exists:tags,id'],
+            'anime_title_id' => ['sometimes', 'integer', 'exists:anime_titles,id'],
             'video_type' => ['sometimes', 'string', 'max:50'],
         ];
     }

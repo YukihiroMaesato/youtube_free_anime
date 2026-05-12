@@ -34,7 +34,7 @@ REQUEST_INTERVAL = 4.5
 _last_request_time: float = 0.0
 
 # 429 リトライ設定
-RETRY_MAX_COUNT    = 3
+RETRY_MAX_COUNT    = 5
 RETRY_WAIT_SECONDS = 20
 
 # ---------------------------------------------------------------------------

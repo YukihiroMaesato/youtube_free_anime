@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class YoutubeChannel extends Model
 {
     use SoftDeletes;
+
+    protected $table = 'youtube_channels';
  
     protected $guarded = [];
  
@@ -19,6 +21,6 @@ class YoutubeChannel extends Model
  
     public function videos(): HasMany
     {
-        return $this->hasMany(Video::class);
+        return $this->hasMany(Video::class, 'youtube_channel_id', 'id');
     }
 }

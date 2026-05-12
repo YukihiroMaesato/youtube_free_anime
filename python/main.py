@@ -19,18 +19,20 @@ from datetime import datetime
 from services.rss_fetcher import fetch_youtube_rss, RSSFetchError
 from services.parser import parse_video
 import services.db as db
+from api.get_data import get_videos_with_channels
+from api.post_video import post_videos_bulk
 
 # -----------------------------------------------------------------------
 # 対象チャンネル設定
 # 複数チャンネルを処理したい場合はここにエントリを追加する
 # -----------------------------------------------------------------------
-CHANNELS = [
-    {
-        "youtube_channel_id": "UC9iC5kXiHNJCCDjEi1lD3UA",
-        "is_official": True,
-        "country_code": "JP",
-    },
-]
+# CHANNELS = [
+#     {
+#         "youtube_channel_id": "UC9iC5kXiHNJCCDjEi1lD3UA",
+#         "is_official": True,
+#         "country_code": "JP",
+#     },
+# ]
 
 RSS_BASE_URL = "https://www.youtube.com/feeds/videos.xml"
 
@@ -93,8 +95,8 @@ def fetch_rss_with_retry(rss_url: str) -> list:
     return []
 
 
-def process_channel(channel_cfg: dict, dry_run: bool, use_bulk: bool) -> None:
-    channel_id = channel_cfg["youtube_channel_id"]
+def process_channel(channel: dict, video_ids: set) -> None:
+    channel_id = channel["youtube_channel_id"]
     rss_url = build_rss_url(channel_id)
 
     logging.info("=" * 60)
@@ -111,86 +113,47 @@ def process_channel(channel_cfg: dict, dry_run: bool, use_bulk: bool) -> None:
         return
 
     # --- 2. パース ---
-    parsed_videos = [parse_video(v) for v in raw_videos]
+    parsed_videos = [
+        parse_video(v)
+        for v in raw_videos
+        if v.get("youtube_video_id") not in video_ids
+    ]
 
+    if len(parsed_videos) == 0:
+        return
     # チャンネル情報は最初の動画から補完する
+    
     first = parsed_videos[0]
     channel_data = {
         "youtube_channel_id": channel_id,
         "name": first.get("channel_name", ""),
         "url": first.get("channel_url", f"https://www.youtube.com/channel/{channel_id}"),
-        "is_official": channel_cfg.get("is_official", True),
-        "country_code": channel_cfg.get("country_code"),
+        "is_official": channel.get("is_official", True),
+        "country_code": channel.get("country_code"),
     }
 
-    # --- 3. dry-run モード: 結果を表示するだけ ---
-    if dry_run:
-        logging.info("[dry-run] チャンネル情報:")
-        logging.info(json.dumps(channel_data, ensure_ascii=False, indent=2))
-        logging.info("[dry-run] 動画 (%d 件):", len(parsed_videos))
-        for v in parsed_videos:
-            logging.info(json.dumps(v, ensure_ascii=False, indent=2))
-            logging.info("-" * 40)
-        return
-
-    # --- 4. Laravel API に送信 ---
-    # if use_bulk:
-    #     # 一括送信（推奨）
-    #     result = db.bulk_sync(channel_data, parsed_videos)
-    #     if result:
-    #         logging.info("[bulk_sync] レスポンス: %s", json.dumps(result, ensure_ascii=False))
-    #     else:
-    #         logging.error("[bulk_sync] 送信に失敗しました。")
-    #         sys.exit(1)
-
-    # else:
-    #     # 個別送信
-    #     ch_result = db.upsert_channel(channel_data)
-    #     if not ch_result:
-    #         logging.error("チャンネルの upsert に失敗しました。処理を中断します。")
-    #         sys.exit(1)
-
-    #     success = 0
-    #     fail = 0
-    #     for video in parsed_videos:
-    #         result = db.upsert_video(video)
-    #         if result:
-    #             success += 1
-    #         else:
-    #             fail += 1
-
-    #     logging.info("動画 upsert 完了 → 成功: %d 件 / 失敗: %d 件", success, fail)
-
+    
+    logging.info("[dry-run] チャンネル情報:")
+    logging.info(json.dumps(channel_data, ensure_ascii=False, indent=2))
+    logging.info("[dry-run] 動画 (%d 件):", len(parsed_videos))
+    post_videos_bulk(parsed_videos)
+    for video in parsed_videos:
+        logging.info(json.dumps(video, ensure_ascii=False, indent=2))
+        logging.info("-" * 40)
+    return
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="YouTube RSS → Laravel API 同期")
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="API に送信せず、パース結果を標準出力に表示する",
-    )
-    parser.add_argument(
-        "--bulk",
-        action="store_true",
-        default=True,
-        help="bulk_sync エンドポイントを使う（デフォルト）",
-    )
-    parser.add_argument(
-        "--individual",
-        action="store_true",
-        default=False,
-        help="チャンネルと動画を個別に upsert する",
-    )
-    args = parser.parse_args()
+    
+    channels = get_videos_with_channels()
+    
+    video_ids = set()  # 空の集合を作る
 
-    use_bulk = not args.individual
+    for channel in channels:    
+        for video in channel['videos']:     
+            video_ids.add(video['youtube_video_id']) 
 
-    for channel_cfg in CHANNELS:
-        process_channel(
-            channel_cfg=channel_cfg,
-            dry_run=args.dry_run,
-            use_bulk=use_bulk,
-        )
+    for channel in channels:
+        process_channel(channel,video_ids)
 
     logging.info("全チャンネルの処理が完了しました。")
 

@@ -4,19 +4,25 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+def get_videos_with_channels()-> dict | None:
+    
+    headers = {
+        "X-Internal-Token": os.getenv("PYTHON_INTERNAL_API_TOKEN")
+    }
 
-headers = {
-    "X-Internal-Token": os.getenv("PYTHON_INTERNAL_API_TOKEN")
-}
+    url = f"{os.getenv('LARAVEL_API_URL')}/api/internal/videos/showMany"
 
-url = "http://nginx_youtube_free_anime/api/internal/videos/showMany"
+    try:
+        response = requests.get(
+            url,
+            headers=headers
+        )
 
-response = requests.get(
-    url,
-    headers=headers
-)
+        response.raise_for_status()
 
-print("status:", response.status_code)
-print("headers:", response.headers)
-print("text:")
-print(response.text)
+        # JSONデータをパースして返す
+        return response.json()
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error occurred: {e}")
+        return None

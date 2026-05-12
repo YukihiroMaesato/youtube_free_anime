@@ -14,13 +14,26 @@ use Illuminate\Support\Facades\Log;
 
 class VideoController extends Controller
 {
-    // テスト用で適当なjsonを返すだけのエンドポイント
+    // 動画とチャンネルの関連を含めて全件取得する
     public function showMany(Request $request): JsonResponse
     {
-        return response()->json([
-            ['id' => 1, 'title' => '動画1', 'description' => '説明1'],
-            ['id' => 2, 'title' => '動画2', 'description' => '説明2'],
-        ]);
+        $channels = YoutubeChannel::with('videos')
+            ->get()
+            ->map(function ($channel) {
+                return [
+                    'youtube_channel_id' => $channel->youtube_channel_id,
+                    'is_official' => $channel->is_official,
+                    'country_code' => $channel->country_code,
+
+                    'videos' => $channel->videos->map(function ($video) {
+                        return [
+                            'youtube_video_id' => $video->youtube_video_id,
+                        ];
+                    }),
+                ];
+            });
+
+        return response()->json($channels);
     }
 
     /**
@@ -43,6 +56,8 @@ class VideoController extends Controller
 
         $savedCount  = 0;
         $errorVideos = [];
+
+        Log::error('[VideoController::bulkStore] データ受信', ['count' => count($videos)]);
 
         foreach ($videos as $data) {
             try {

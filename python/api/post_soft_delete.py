@@ -1,43 +1,67 @@
 import os
-import requests
 from urllib.parse import quote
 from datetime import datetime
 
+import requests
 from dotenv import load_dotenv
+
+from services.logger import logger
 
 load_dotenv()
 
 
 def soft_delete_videos() -> dict:
-    headers = {
-        "X-Internal-Token": os.getenv("PYTHON_INTERNAL_API_TOKEN"),
-        "Content-Type": "application/json",
-    }
-    
-    now = datetime.now().isoformat()
-    
-    # URLエンコード
-    encoded_datetime = quote(now)
-    
-    print(f"Soft deleting videos at {encoded_datetime}...")
+    try:
+        headers = {
+            "X-Internal-Token": os.getenv("PYTHON_INTERNAL_API_TOKEN"),
+            "Content-Type": "application/json",
+        }
 
-    url = (
-        f"{os.getenv('LARAVEL_API_URL')}"
-        f"/api/internal/videos/{encoded_datetime}/soft-delete"
-    )
+        now = datetime.now().isoformat()
 
-    response = requests.post(
-        url,
-        headers=headers,
-        timeout=30
-    )
+        encoded_datetime = quote(now)
 
-    response.raise_for_status()
+        url = (
+            f"{os.getenv('LARAVEL_API_URL')}"
+            f"/api/internal/videos/{encoded_datetime}/soft-delete"
+        )
 
-    return response.json()
+        response = requests.post(
+            url,
+            headers=headers,
+            timeout=30
+        )
+
+        response.raise_for_status()
+
+        return response.json()
+
+    except requests.HTTPError:
+        logger.exception(
+            "soft_delete_videos HTTPエラー url=%s",
+            url
+        )
+        raise
+
+    except requests.RequestException:
+        logger.exception(
+            "soft_delete_videos リクエストエラー url=%s",
+            url
+        )
+        raise
+
+    except Exception:
+        logger.exception(
+            "soft_delete_videos 予期せぬエラー"
+        )
+        raise
 
 
 if __name__ == "__main__":
-    result = soft_delete_videos()
+    try:
+        result = soft_delete_videos()
 
-    print(result)
+    except Exception:
+        logger.exception(
+            "soft_delete_videos 実行失敗"
+        )

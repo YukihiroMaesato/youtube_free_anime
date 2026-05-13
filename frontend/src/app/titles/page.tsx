@@ -129,7 +129,8 @@ export default function TitlesPage() {
               style={{ width: '64px', height: '64px' }}
               priority
             />
-            <Image
+            <Link href="/">
+              <Image
               className="rounded-2xl object-contain shadow-sm"
               src="/background/title.png"
               alt=""
@@ -138,7 +139,8 @@ export default function TitlesPage() {
               sizes="(max-width: 640px) 280px, 420px"
               style={{ height: '64px', width: '650px' }}
               priority
-            />
+            />  
+            </Link>
           </h1>
         </div>
         <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">

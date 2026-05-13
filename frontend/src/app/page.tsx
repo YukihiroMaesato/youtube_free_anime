@@ -362,6 +362,7 @@ export default function Home() {
                   style={{ width: '64px', height: '64px' }}
                   priority
                 />
+                <Link href="/">
                 <Image
                   className="rounded-2xl object-contain shadow-sm"
                   src="/background/title.png"
@@ -372,6 +373,7 @@ export default function Home() {
                   style={{ height: '64px', width: '650px' }}
                   priority
                 />
+                </Link>
               </h1>
             </div>
 

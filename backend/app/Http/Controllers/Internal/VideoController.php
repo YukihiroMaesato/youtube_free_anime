@@ -7,6 +7,7 @@ use App\Models\AnimeTitle;
 use App\Models\Tag;
 use App\Models\Video;
 use App\Models\YoutubeChannel;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -36,6 +37,22 @@ class VideoController extends Controller
         return response()->json($channels);
     }
 
+    public function softDelete(string $datetime): JsonResponse
+    {
+        // 渡された日時を Carbon 化
+        $targetDateTime = Carbon::parse($datetime);
+
+        // free_until_at が渡された日時より前の動画を論理削除
+        $deletedCount = Video::query()
+            ->whereNotNull('free_until_at')
+            ->where('free_until_at', '<', $targetDateTime)
+            ->delete();
+
+        return response()->json([
+            'success' => true,
+            'deleted_count' => $deletedCount,
+        ]);
+    }
     /**
      * Python から受け取った動画データを一括保存する
      *

@@ -24,4 +24,6 @@ Route::middleware('internal.token')
         Route::get('/videos/showMany', [InternalVideoController::class, 'showMany']);
 
         Route::post('/videos/bulk-store', [InternalVideoController::class, 'bulkStore']);
+
+        Route::post('/videos/{datetime}/soft-delete', [InternalVideoController::class, 'softDelete']);
     });

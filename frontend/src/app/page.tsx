@@ -151,7 +151,7 @@ function VideoCard({ video }: { video: Video }) {
           )}
           {freeUntilAt && (
             <span className="rounded-full border border-rose-100 bg-rose-50 px-2 py-1 text-rose-700">
-              無料期限 {freeUntilAt}
+              公開終了日 {freeUntilAt}
             </span>
           )}
         </div>

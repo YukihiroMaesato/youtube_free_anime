@@ -22,17 +22,6 @@ import services.db as db
 from api.get_data import get_videos_with_channels
 from api.post_video import post_videos_bulk
 
-# -----------------------------------------------------------------------
-# 対象チャンネル設定
-# 複数チャンネルを処理したい場合はここにエントリを追加する
-# -----------------------------------------------------------------------
-# CHANNELS = [
-#     {
-#         "youtube_channel_id": "UC9iC5kXiHNJCCDjEi1lD3UA",
-#         "is_official": True,
-#         "country_code": "JP",
-#     },
-# ]
 
 RSS_BASE_URL = "https://www.youtube.com/feeds/videos.xml"
 

@@ -360,7 +360,14 @@ export default function Home() {
                   height={56}
                   priority
                 />
-                <span>推しアニ見っけ！</span>
+                <Image
+                  className="rounded-2xl object-cover shadow-sm"
+                  src="/background/title.png"
+                  alt=""
+                  width={356}
+                  height={356}
+                  priority
+                />
               </h1>
             </div>
 

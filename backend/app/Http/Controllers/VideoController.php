@@ -32,7 +32,7 @@ class VideoController extends Controller
             $query->where('anime_title_id', $validated['anime_title_id']);
         }
 
-        $videos = $query->paginate(30)
+        $videos = $query->paginate(20)
             ->through(function (Video $video) {
                 return [
                     'id' => $video->id,

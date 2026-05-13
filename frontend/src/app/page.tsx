@@ -119,7 +119,7 @@ function VideoCard({ video }: { video: Video }) {
   }, []);
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-pink-100 bg-white shadow-sm">
+    <article className="overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-sm">
       <div className="aspect-video w-full bg-neutral-100">
         <iframe
           ref={iframeRef}
@@ -175,7 +175,7 @@ function Pagination({
   const isLastPage = pagination.current_page >= pagination.last_page;
 
   return (
-    <nav className="flex flex-col gap-3 rounded-2xl border border-pink-100 bg-white/95 p-4 text-sm text-neutral-700 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+    <nav className="flex flex-col gap-3 rounded-2xl border border-sky-100 bg-white/95 p-4 text-sm text-neutral-700 shadow-sm sm:flex-row sm:items-center sm:justify-between">
       <p>
         {pagination.total === 0
           ? '0件'
@@ -185,7 +185,7 @@ function Pagination({
       <div className="flex items-center gap-2">
         <button
           type="button"
-          className="rounded-full border border-pink-200 bg-pink-50 px-4 py-2 text-pink-700 disabled:cursor-not-allowed disabled:border-neutral-200 disabled:bg-neutral-50 disabled:text-neutral-400"
+          className="rounded-full border border-sky-200 bg-sky-50 px-4 py-2 text-sky-700 disabled:cursor-not-allowed disabled:border-neutral-200 disabled:bg-neutral-50 disabled:text-neutral-400"
           onClick={() => onPageChange(pagination.current_page - 1)}
           disabled={isFirstPage}
         >
@@ -196,7 +196,7 @@ function Pagination({
         </span>
         <button
           type="button"
-          className="rounded-full border border-pink-200 bg-pink-50 px-4 py-2 text-pink-700 disabled:cursor-not-allowed disabled:border-neutral-200 disabled:bg-neutral-50 disabled:text-neutral-400"
+          className="rounded-full border border-sky-200 bg-sky-50 px-4 py-2 text-sky-700 disabled:cursor-not-allowed disabled:border-neutral-200 disabled:bg-neutral-50 disabled:text-neutral-400"
           onClick={() => onPageChange(pagination.current_page + 1)}
           disabled={isLastPage}
         >
@@ -369,8 +369,8 @@ export default function Home() {
                 type="button"
                 className={`rounded-full border px-4 py-2 text-sm shadow-sm ${
                   selectedTagId === null
-                    ? 'border-pink-500 bg-pink-500 text-white'
-                    : 'border-pink-200 bg-pink-50 text-pink-700 hover:border-pink-400'
+                    ? 'border-emerald-600 bg-emerald-600 text-white'
+                    : 'border-sky-200 bg-sky-50 text-sky-700 hover:border-sky-400'
                 }`}
                 onClick={() => selectTag(null)}
               >
@@ -382,8 +382,8 @@ export default function Home() {
                   type="button"
                   className={`rounded-full border px-4 py-2 text-sm shadow-sm ${
                     selectedTagId === tag.id
-                      ? 'border-pink-500 bg-pink-500 text-white'
-                      : 'border-pink-200 bg-pink-50 text-pink-700 hover:border-pink-400'
+                      ? 'border-emerald-600 bg-emerald-600 text-white'
+                      : 'border-sky-200 bg-sky-50 text-sky-700 hover:border-sky-400'
                   }`}
                   onClick={() => selectTag(tag.id)}
                 >
@@ -398,7 +398,7 @@ export default function Home() {
               <div className="mt-2 flex gap-2">
                 <input
                   id="anime-title-search"
-                  className="min-w-0 flex-1 rounded-full border border-pink-200 bg-white/95 px-4 py-2 text-sm outline-none focus:border-pink-500"
+                  className="min-w-0 flex-1 rounded-full border border-sky-200 bg-white/95 px-4 py-2 text-sm outline-none focus:border-emerald-600"
                   type="search"
                   value={titleSearch}
                   placeholder="タイトルを検索"
@@ -422,12 +422,12 @@ export default function Home() {
               </div>
 
               {titleSearch.trim() !== '' && titleOptions.length > 0 && !selectedTitle && (
-                <div className="absolute left-0 right-0 top-full z-20 mt-2 max-h-72 overflow-y-auto rounded-2xl border border-pink-100 bg-white shadow-lg">
+                <div className="absolute left-0 right-0 top-full z-20 mt-2 max-h-72 overflow-y-auto rounded-2xl border border-sky-100 bg-white shadow-lg">
                   {titleOptions.map((title) => (
                     <button
                       key={title.id}
                       type="button"
-                      className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm hover:bg-pink-50"
+                      className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm hover:bg-sky-50"
                       onClick={() => selectTitle(title)}
                     >
                       <span>{title.title}</span>

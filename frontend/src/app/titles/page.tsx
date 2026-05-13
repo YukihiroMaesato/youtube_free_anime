@@ -139,13 +139,13 @@ export default function TitlesPage() {
         )}
 
         {activeGroups.length > 0 && (
-          <nav className="sticky top-0 z-10 mb-8 flex flex-wrap gap-2 rounded-2xl border border-pink-100 bg-white/95 p-3 shadow-sm">
+          <nav className="sticky top-0 z-10 mb-8 flex flex-wrap gap-2 rounded-2xl border border-sky-100 bg-white/95 p-3 shadow-sm">
             <button
               type="button"
               className={`rounded-full border px-4 py-2 text-sm shadow-sm ${
                 selectedGroup === null
-                  ? 'border-pink-500 bg-pink-500 text-white'
-                  : 'border-pink-200 bg-pink-50 text-pink-700 hover:border-pink-400'
+                  ? 'border-emerald-600 bg-emerald-600 text-white'
+                  : 'border-sky-200 bg-sky-50 text-sky-700 hover:border-sky-400'
               }`}
               onClick={() => setSelectedGroup(null)}
             >
@@ -157,8 +157,8 @@ export default function TitlesPage() {
                 type="button"
                 className={`rounded-full border px-4 py-2 text-sm shadow-sm ${
                   selectedGroup === group
-                    ? 'border-pink-500 bg-pink-500 text-white'
-                    : 'border-pink-200 bg-pink-50 text-pink-700 hover:border-pink-400'
+                    ? 'border-emerald-600 bg-emerald-600 text-white'
+                    : 'border-sky-200 bg-sky-50 text-sky-700 hover:border-sky-400'
                 }`}
                 onClick={() => setSelectedGroup(group)}
               >
@@ -171,12 +171,12 @@ export default function TitlesPage() {
         <div className="space-y-10">
           {visibleGroups.map((group) => (
             <section key={group} id={group} className="scroll-mt-20">
-              <h2 className="mb-4 border-b border-pink-100 pb-2 text-xl font-semibold">{group}</h2>
+              <h2 className="mb-4 border-b border-sky-100 pb-2 text-xl font-semibold">{group}</h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {groupedTitles[group].map((title) => (
                   <Link
                     key={title.id}
-                    className="flex items-center justify-between gap-4 rounded-2xl border border-pink-100 bg-white/95 px-4 py-3 text-sm shadow-sm hover:border-pink-400"
+                    className="flex items-center justify-between gap-4 rounded-2xl border border-sky-100 bg-white/95 px-4 py-3 text-sm shadow-sm hover:border-sky-400"
                     href={`/?anime_title_id=${title.id}&title=${encodeURIComponent(title.title)}`}
                   >
                     <span>{title.title}</span>

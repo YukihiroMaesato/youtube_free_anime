@@ -111,11 +111,17 @@ export default function TitlesPage() {
   const visibleGroups = selectedGroup ? activeGroups.filter((group) => group === selectedGroup) : activeGroups;
 
   return (
-    <main className="min-h-screen bg-white px-5 py-8 text-neutral-950 sm:px-8">
+    <main
+      className="min-h-screen bg-white bg-cover bg-fixed bg-center px-5 py-8 text-neutral-950 sm:px-8"
+      style={{ backgroundImage: "url('/background/ip-background.svg')" }}
+    >
       <div className="mx-auto max-w-6xl">
         <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <h1 className="text-2xl font-bold">タイトル一覧</h1>
-          <Link className="w-fit border border-neutral-300 px-3 py-2 text-sm text-neutral-700" href="/">
+          <Link
+            className="w-fit rounded-full border border-sky-200 bg-sky-50 px-4 py-2 text-sm text-sky-700 shadow-sm hover:border-sky-400"
+            href="/"
+          >
             動画一覧へ戻る
           </Link>
         </header>
@@ -123,7 +129,7 @@ export default function TitlesPage() {
         {isLoading && <p className="text-neutral-600">タイトルを読み込み中です。</p>}
 
         {errorMessage && (
-          <p className="rounded border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <p className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             {errorMessage}
           </p>
         )}
@@ -133,13 +139,13 @@ export default function TitlesPage() {
         )}
 
         {activeGroups.length > 0 && (
-          <nav className="sticky top-0 z-10 mb-8 flex flex-wrap gap-2 border-b border-neutral-200 bg-white py-3">
+          <nav className="sticky top-0 z-10 mb-8 flex flex-wrap gap-2 rounded-2xl border border-pink-100 bg-white/95 p-3 shadow-sm">
             <button
               type="button"
-              className={`border px-3 py-2 text-sm ${
+              className={`rounded-full border px-4 py-2 text-sm shadow-sm ${
                 selectedGroup === null
-                  ? 'border-neutral-900 bg-neutral-900 text-white'
-                  : 'border-neutral-300 text-neutral-700 hover:border-neutral-900 hover:text-neutral-950'
+                  ? 'border-pink-500 bg-pink-500 text-white'
+                  : 'border-pink-200 bg-pink-50 text-pink-700 hover:border-pink-400'
               }`}
               onClick={() => setSelectedGroup(null)}
             >
@@ -149,10 +155,10 @@ export default function TitlesPage() {
               <button
                 key={group}
                 type="button"
-                className={`border px-3 py-2 text-sm ${
+                className={`rounded-full border px-4 py-2 text-sm shadow-sm ${
                   selectedGroup === group
-                    ? 'border-neutral-900 bg-neutral-900 text-white'
-                    : 'border-neutral-300 text-neutral-700 hover:border-neutral-900 hover:text-neutral-950'
+                    ? 'border-pink-500 bg-pink-500 text-white'
+                    : 'border-pink-200 bg-pink-50 text-pink-700 hover:border-pink-400'
                 }`}
                 onClick={() => setSelectedGroup(group)}
               >
@@ -165,12 +171,12 @@ export default function TitlesPage() {
         <div className="space-y-10">
           {visibleGroups.map((group) => (
             <section key={group} id={group} className="scroll-mt-20">
-              <h2 className="mb-4 border-b border-neutral-200 pb-2 text-xl font-semibold">{group}</h2>
+              <h2 className="mb-4 border-b border-pink-100 pb-2 text-xl font-semibold">{group}</h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {groupedTitles[group].map((title) => (
                   <Link
                     key={title.id}
-                    className="flex items-center justify-between gap-4 border border-neutral-200 px-4 py-3 text-sm hover:border-neutral-900"
+                    className="flex items-center justify-between gap-4 rounded-2xl border border-pink-100 bg-white/95 px-4 py-3 text-sm shadow-sm hover:border-pink-400"
                     href={`/?anime_title_id=${title.id}&title=${encodeURIComponent(title.title)}`}
                   >
                     <span>{title.title}</span>

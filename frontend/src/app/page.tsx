@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 
@@ -118,7 +119,7 @@ function VideoCard({ video }: { video: Video }) {
   }, []);
 
   return (
-    <article className="overflow-hidden border border-neutral-200 bg-white">
+    <article className="overflow-hidden rounded-2xl border border-pink-100 bg-white shadow-sm">
       <div className="aspect-video w-full bg-neutral-100">
         <iframe
           ref={iframeRef}
@@ -141,13 +142,17 @@ function VideoCard({ video }: { video: Video }) {
 
         <div className="flex flex-wrap gap-2 text-xs text-neutral-600">
           {episodeLabel && (
-            <span className="border border-neutral-200 px-2 py-1">{episodeLabel}</span>
+            <span className="rounded-full border border-sky-100 bg-sky-50 px-2 py-1 text-sky-700">{episodeLabel}</span>
           )}
           {publishedAt && (
-            <span className="border border-neutral-200 px-2 py-1">公開日 {publishedAt}</span>
+            <span className="rounded-full border border-emerald-100 bg-emerald-50 px-2 py-1 text-emerald-700">
+              公開日 {publishedAt}
+            </span>
           )}
           {freeUntilAt && (
-            <span className="border border-neutral-200 px-2 py-1">無料期限 {freeUntilAt}</span>
+            <span className="rounded-full border border-rose-100 bg-rose-50 px-2 py-1 text-rose-700">
+              無料期限 {freeUntilAt}
+            </span>
           )}
         </div>
 
@@ -170,7 +175,7 @@ function Pagination({
   const isLastPage = pagination.current_page >= pagination.last_page;
 
   return (
-    <nav className="flex flex-col gap-3 border border-neutral-200 bg-white p-4 text-sm text-neutral-700 sm:flex-row sm:items-center sm:justify-between">
+    <nav className="flex flex-col gap-3 rounded-2xl border border-pink-100 bg-white/95 p-4 text-sm text-neutral-700 shadow-sm sm:flex-row sm:items-center sm:justify-between">
       <p>
         {pagination.total === 0
           ? '0件'
@@ -180,7 +185,7 @@ function Pagination({
       <div className="flex items-center gap-2">
         <button
           type="button"
-          className="border border-neutral-300 px-3 py-2 text-neutral-800 disabled:cursor-not-allowed disabled:border-neutral-200 disabled:text-neutral-400"
+          className="rounded-full border border-pink-200 bg-pink-50 px-4 py-2 text-pink-700 disabled:cursor-not-allowed disabled:border-neutral-200 disabled:bg-neutral-50 disabled:text-neutral-400"
           onClick={() => onPageChange(pagination.current_page - 1)}
           disabled={isFirstPage}
         >
@@ -191,7 +196,7 @@ function Pagination({
         </span>
         <button
           type="button"
-          className="border border-neutral-300 px-3 py-2 text-neutral-800 disabled:cursor-not-allowed disabled:border-neutral-200 disabled:text-neutral-400"
+          className="rounded-full border border-pink-200 bg-pink-50 px-4 py-2 text-pink-700 disabled:cursor-not-allowed disabled:border-neutral-200 disabled:bg-neutral-50 disabled:text-neutral-400"
           onClick={() => onPageChange(pagination.current_page + 1)}
           disabled={isLastPage}
         >
@@ -338,21 +343,34 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-white px-5 py-8 text-neutral-950 sm:px-8">
+    <main
+      className="min-h-screen bg-white bg-cover bg-fixed bg-center px-5 py-8 text-neutral-950 sm:px-8"
+      style={{ backgroundImage: "url('/background/ip-background.svg')" }}
+    >
       <div className="mx-auto max-w-6xl">
         <header className="mb-8 space-y-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="flex flex-col gap-3">
-              <h1 className="text-3xl font-bold">推しアニ見っけ！</h1>
+              <h1 className="flex items-center gap-3 text-3xl font-bold">
+                <Image
+                  className="rounded-2xl object-cover shadow-sm"
+                  src="/icon/cat.png"
+                  alt=""
+                  width={56}
+                  height={56}
+                  priority
+                />
+                <span>推しアニ見っけ！</span>
+              </h1>
             </div>
 
             <div className="flex max-w-3xl flex-wrap gap-2">
               <button
                 type="button"
-                className={`border px-3 py-2 text-sm ${
+                className={`rounded-full border px-4 py-2 text-sm shadow-sm ${
                   selectedTagId === null
-                    ? 'border-neutral-900 bg-neutral-900 text-white'
-                    : 'border-neutral-300 text-neutral-700'
+                    ? 'border-pink-500 bg-pink-500 text-white'
+                    : 'border-pink-200 bg-pink-50 text-pink-700 hover:border-pink-400'
                 }`}
                 onClick={() => selectTag(null)}
               >
@@ -362,10 +380,10 @@ export default function Home() {
                 <button
                   key={tag.id}
                   type="button"
-                  className={`border px-3 py-2 text-sm ${
+                  className={`rounded-full border px-4 py-2 text-sm shadow-sm ${
                     selectedTagId === tag.id
-                      ? 'border-neutral-900 bg-neutral-900 text-white'
-                      : 'border-neutral-300 text-neutral-700'
+                      ? 'border-pink-500 bg-pink-500 text-white'
+                      : 'border-pink-200 bg-pink-50 text-pink-700 hover:border-pink-400'
                   }`}
                   onClick={() => selectTag(tag.id)}
                 >
@@ -377,13 +395,10 @@ export default function Home() {
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div className="relative w-full max-w-xl">
-              <label className="block text-sm font-medium text-neutral-700" htmlFor="anime-title-search">
-                タイトル
-              </label>
               <div className="mt-2 flex gap-2">
                 <input
                   id="anime-title-search"
-                  className="min-w-0 flex-1 border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+                  className="min-w-0 flex-1 rounded-full border border-pink-200 bg-white/95 px-4 py-2 text-sm outline-none focus:border-pink-500"
                   type="search"
                   value={titleSearch}
                   placeholder="タイトルを検索"
@@ -398,7 +413,7 @@ export default function Home() {
                 {selectedTitle && (
                   <button
                     type="button"
-                    className="border border-neutral-300 px-3 py-2 text-sm text-neutral-700"
+                    className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-700"
                     onClick={() => selectTitle(null)}
                   >
                     解除
@@ -407,12 +422,12 @@ export default function Home() {
               </div>
 
               {titleSearch.trim() !== '' && titleOptions.length > 0 && !selectedTitle && (
-                <div className="absolute left-0 right-0 top-full z-20 mt-2 max-h-72 overflow-y-auto border border-neutral-200 bg-white shadow-lg">
+                <div className="absolute left-0 right-0 top-full z-20 mt-2 max-h-72 overflow-y-auto rounded-2xl border border-pink-100 bg-white shadow-lg">
                   {titleOptions.map((title) => (
                     <button
                       key={title.id}
                       type="button"
-                      className="flex w-full items-center justify-between gap-4 px-3 py-2 text-left text-sm hover:bg-neutral-50"
+                      className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm hover:bg-pink-50"
                       onClick={() => selectTitle(title)}
                     >
                       <span>{title.title}</span>
@@ -429,7 +444,10 @@ export default function Home() {
               )}
             </div>
 
-            <Link className="w-fit shrink-0 border border-neutral-300 px-3 py-2 text-sm text-neutral-700" href="/titles">
+            <Link
+              className="w-fit shrink-0 rounded-full border border-sky-200 bg-sky-50 px-4 py-2 text-sm text-sky-700 shadow-sm hover:border-sky-400"
+              href="/titles"
+            >
               タイトル一覧
             </Link>
           </div>
@@ -438,7 +456,7 @@ export default function Home() {
         {isLoading && <p className="text-neutral-600">動画を読み込み中です。</p>}
 
         {errorMessage && (
-          <p className="rounded border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <p className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             {errorMessage}
           </p>
         )}

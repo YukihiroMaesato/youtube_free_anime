@@ -13,22 +13,40 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+
 class VideoController extends Controller
 {
+    public const SHORT_VIDEO_THRESHOLD_SECONDS = 360;
     // 動画とチャンネルの関連を含めて全件取得する
     public function showMany(Request $request): JsonResponse
     {
-        $channels = YoutubeChannel::with('videos')
+        $channels = YoutubeChannel::with(['videos' => function ($query) {
+            // 1. 論理削除されたレコードも検索対象に含める
+            $query->withTrashed()
+                ->where(function ($q) {
+                    // 2. 「削除されていない動画」
+                    $q->whereNull('deleted_at')
+                        // 3. または「削除されているが、360秒以下かつ0より大きい動画」
+                        ->orWhere(function ($sq) {
+                            $sq->whereNotNull('deleted_at')
+                                ->where('video_duration', '<=', self::SHORT_VIDEO_THRESHOLD_SECONDS)
+                                ->where('video_duration', '>', 0);
+                        });
+                });
+        }])
             ->get()
             ->map(function ($channel) {
                 return [
                     'youtube_channel_id' => $channel->youtube_channel_id,
-                    'is_official' => $channel->is_official,
-                    'country_code' => $channel->country_code,
+                    'is_official'        => $channel->is_official,
+                    'country_code'       => $channel->country_code,
 
                     'videos' => $channel->videos->map(function ($video) {
                         return [
                             'youtube_video_id' => $video->youtube_video_id,
+                            // 確認用に duration や 削除フラグ を含めることも可能です
+                            'video_duration'   => $video->video_duration,
+                            'is_deleted'       => $video->trashed(),
                         ];
                     }),
                 ];
@@ -163,9 +181,16 @@ class VideoController extends Controller
                             'episode_end'    => $data['episode_end']    ?? null,
                             'season_number'  => $data['season_number']  ?? null,
 
+                            'video_duration'     => $data['video_duration']   ?? 0,
+
                             'fetched_at' => now(),
                         ]
                     );
+
+                    // 動画ではなく、広告の場合があるので5分以下の動画は論理削除
+                    if ($video->video_duration > 0 && $video->video_duration <= self::SHORT_VIDEO_THRESHOLD_SECONDS) {
+                        $video->delete();
+                    }
 
                     // --------------------------------------------------
                     // 4. Tags

@@ -16,6 +16,7 @@ import logging
 import time
 from datetime import datetime
 
+from services.youtube_data_api_3 import add_video_durations
 from services.rss_fetcher import fetch_youtube_rss, RSSFetchError
 from services.parser import parse_video
 import services.db as db
@@ -121,15 +122,14 @@ def process_channel(channel: dict, video_ids: set) -> None:
         "country_code": channel.get("country_code"),
     }
 
+    parsed_videos = add_video_durations(parsed_videos)
     
     logging.info("[dry-run] チャンネル情報:")
     logging.info(json.dumps(channel_data, ensure_ascii=False, indent=2))
     logging.info("[dry-run] 動画 (%d 件):", len(parsed_videos))
+    
     post_videos_bulk(parsed_videos)
-    for video in parsed_videos:
-        logging.info(json.dumps(video, ensure_ascii=False, indent=2))
-        logging.info("-" * 40)
-    return
+    
 
 def main() -> None:
     

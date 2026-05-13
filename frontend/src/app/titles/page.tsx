@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
@@ -116,6 +117,30 @@ export default function TitlesPage() {
       style={{ backgroundImage: "url('/background/ip-background.svg')" }}
     >
       <div className="mx-auto max-w-6xl">
+        <div className="flex flex-col gap-3">
+          <h1 className="flex items-center gap-1 text-3xl font-bold">
+            <Image
+              className="rounded-2xl object-cover shadow-sm"
+              src="/icon/cat.png"
+              alt=""
+              width={1536}
+              height={1024}
+              sizes="64px"
+              style={{ width: '64px', height: '64px' }}
+              priority
+            />
+            <Image
+              className="rounded-2xl object-contain shadow-sm"
+              src="/background/title.png"
+              alt=""
+              width={3721}
+              height={268}
+              sizes="(max-width: 640px) 280px, 420px"
+              style={{ height: '64px', width: '650px' }}
+              priority
+            />
+          </h1>
+        </div>
         <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <h1 className="text-2xl font-bold">タイトル一覧</h1>
           <Link
@@ -142,11 +167,10 @@ export default function TitlesPage() {
           <nav className="sticky top-0 z-10 mb-8 flex flex-wrap gap-2 rounded-2xl border border-sky-100 bg-white/95 p-3 shadow-sm">
             <button
               type="button"
-              className={`rounded-full border px-4 py-2 text-sm shadow-sm ${
-                selectedGroup === null
+              className={`rounded-full border px-4 py-2 text-sm shadow-sm ${selectedGroup === null
                   ? 'border-emerald-600 bg-emerald-600 text-white'
                   : 'border-sky-200 bg-sky-50 text-sky-700 hover:border-sky-400'
-              }`}
+                }`}
               onClick={() => setSelectedGroup(null)}
             >
               すべて
@@ -155,11 +179,10 @@ export default function TitlesPage() {
               <button
                 key={group}
                 type="button"
-                className={`rounded-full border px-4 py-2 text-sm shadow-sm ${
-                  selectedGroup === group
+                className={`rounded-full border px-4 py-2 text-sm shadow-sm ${selectedGroup === group
                     ? 'border-emerald-600 bg-emerald-600 text-white'
                     : 'border-sky-200 bg-sky-50 text-sky-700 hover:border-sky-400'
-                }`}
+                  }`}
                 onClick={() => setSelectedGroup(group)}
               >
                 {group}

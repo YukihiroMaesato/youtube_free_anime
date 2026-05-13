@@ -351,21 +351,25 @@ export default function Home() {
         <header className="mb-8 space-y-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="flex flex-col gap-3">
-              <h1 className="flex items-center gap-3 text-3xl font-bold">
+              <h1 className="flex items-center gap-1 text-3xl font-bold">
                 <Image
                   className="rounded-2xl object-cover shadow-sm"
                   src="/icon/cat.png"
                   alt=""
-                  width={56}
-                  height={56}
+                  width={1536}
+                  height={1024}
+                  sizes="64px"
+                  style={{ width: '64px', height: '64px' }}
                   priority
                 />
                 <Image
-                  className="rounded-2xl object-cover shadow-sm"
+                  className="rounded-2xl object-contain shadow-sm"
                   src="/background/title.png"
                   alt=""
-                  width={356}
-                  height={356}
+                  width={3721}
+                  height={268}
+                  sizes="(max-width: 640px) 280px, 420px"
+                  style={{ height: '64px', width: '650px' }}
                   priority
                 />
               </h1>
@@ -423,7 +427,7 @@ export default function Home() {
                     className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-700"
                     onClick={() => selectTitle(null)}
                   >
-                    解除
+                    クリア
                   </button>
                 )}
               </div>

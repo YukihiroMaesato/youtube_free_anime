@@ -9,7 +9,6 @@ from services.logger import logger
 from services.youtube_data_api_3 import add_video_durations
 from services.rss_fetcher import fetch_youtube_rss, RSSFetchError
 from services.parser import parse_video
-import services.db as db
 from api.get_data import get_videos_with_channels
 from api.post_video import post_videos_bulk
 

@@ -19,8 +19,6 @@ WORKDIR /var/www
 
 COPY . .
 
-WORKDIR /var/www/backend
-
 RUN composer install
 
 RUN mkdir -p storage bootstrap/cache \

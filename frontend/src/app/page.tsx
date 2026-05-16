@@ -350,8 +350,8 @@ export default function Home() {
       <div className="mx-auto max-w-6xl">
         <header className="mb-8 space-y-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="flex flex-col gap-3">
-              <h1 className="flex items-center gap-1 text-3xl font-bold">
+            <div className="min-w-0 flex flex-col gap-3">
+              <h1 className="flex max-w-full items-center gap-2 text-3xl font-bold">
                 <Image
                   className="rounded-2xl object-cover shadow-sm"
                   src="/icon/cat.png"
@@ -363,16 +363,16 @@ export default function Home() {
                   priority
                 />
                 <Link href="/">
-                <Image
-                  className="rounded-2xl object-contain shadow-sm"
-                  src="/background/title.png"
-                  alt=""
-                  width={3721}
-                  height={268}
-                  sizes="(max-width: 640px) 280px, 420px"
-                  style={{ height: '64px', width: '650px' }}
-                  priority
-                />
+                  <Image
+                    className="min-w-0 shrink rounded-2xl object-contain shadow-sm"
+                    src="/background/title.png"
+                    alt=""
+                    width={3721}
+                    height={268}
+                    sizes="(max-width: 640px) 280px, 420px"
+                    style={{ height: '64px', width: 'min(420px, 100%)' }}
+                    priority
+                  />
                 </Link>
               </h1>
             </div>

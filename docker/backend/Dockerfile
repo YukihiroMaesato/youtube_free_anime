@@ -19,7 +19,5 @@ WORKDIR /var/www
 
 COPY . .
 
-RUN composer install
-
 RUN mkdir -p storage bootstrap/cache \
  && chown -R www-data:www-data storage bootstrap/cache

@@ -73,6 +73,7 @@ services:
     volumes:
       - ./docker/nginx/default.conf:/etc/nginx/templates/default.conf.template
       - ./backend/public:/var/www/public
+      - ./logs/nginx:/var/log/nginx/daily
     environment:
       - CSP_SCRIPT_SRC='unsafe-inline' 'unsafe-eval'
       - NGINX_ENVSUBST_FILTER=CSP_SCRIPT_SRC

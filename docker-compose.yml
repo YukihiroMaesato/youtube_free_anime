@@ -35,6 +35,11 @@ services:
     working_dir: /app
     volumes:
       - ./python:/app
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
+      - PYTHON_INTERNAL_API_TOKEN=${PYTHON_INTERNAL_API_TOKEN}
+      - LARAVEL_API_URL=${LARAVEL_API_URL}
     depends_on:
       - db_youtube_free_anime
       - backend_youtube_free_anime
@@ -49,13 +54,13 @@ services:
     image: postgres:16
     container_name: db_youtube_free_anime
     environment:
-      POSTGRES_DB: youtube_free_anime_db
-      POSTGRES_USER: youtube_free_anime_user
-      POSTGRES_PASSWORD: youtube_free_anime_pass
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - db_youtube_free_anime_data:/var/lib/postgresql/data
     ports:
-      - "5434:5432"
+      - "127.0.0.1:5434:5432"
     networks:
       - youtube_free_anime_network
 
@@ -64,9 +69,13 @@ services:
     container_name: nginx_youtube_free_anime
     ports:
       - "81:80"
+      - "443:443"
     volumes:
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx/default.conf:/etc/nginx/templates/default.conf.template
       - ./backend/public:/var/www/public
+    environment:
+      - CSP_SCRIPT_SRC='unsafe-inline' 'unsafe-eval'
+      - NGINX_ENVSUBST_FILTER=CSP_SCRIPT_SRC
     depends_on:
       - frontend_youtube_free_anime
       - backend_youtube_free_anime

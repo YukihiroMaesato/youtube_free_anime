@@ -21,8 +21,6 @@ services:
     container_name: backend_youtube_free_anime
     expose:
       - "9000"
-    volumes:
-      - ./backend:/var/www
     depends_on:
       - db_youtube_free_anime
     restart: unless-stopped
@@ -72,7 +70,6 @@ services:
       - "443:443"
     volumes:
       - ./docker/nginx/default.conf:/etc/nginx/templates/default.conf.template
-      - ./backend/public:/var/www/public
       - ./logs/nginx:/var/log/nginx/daily
     environment:
       - CSP_SCRIPT_SRC='self'

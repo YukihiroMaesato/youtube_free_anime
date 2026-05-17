@@ -1,0 +1,41 @@
+FROM php:8.3-fpm
+
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libpq-dev \
+    libonig-dev \
+    libxml2-dev \
+ && docker-php-ext-install \
+    pdo_pgsql \
+    mbstring \
+    bcmath \
+    xml \
+    pcntl \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www
+
+# composer install 用に先にコピー
+COPY backend/composer.json backend/composer.lock ./
+
+# Laravel scripts を一旦無効化
+RUN composer install \
+    --no-dev \
+    --optimize-autoloader \
+    --no-interaction \
+    --no-scripts
+
+# Laravel本体コピー
+COPY backend ./
+
+# artisan が存在する状態で package discover
+RUN php artisan package:discover --ansi
+
+# 権限調整
+RUN mkdir -p storage bootstrap/cache \
+ && chown -R www-data:www-data storage bootstrap/cache
+
+USER www-data

@@ -1,0 +1,92 @@
+services:
+  frontend_youtube_free_anime:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile.prod
+    container_name: frontend_youtube_free_anime
+    expose:
+      - "3000"
+    depends_on:
+      - backend_youtube_free_anime
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+    networks:
+      - youtube_free_anime_network
+
+  backend_youtube_free_anime:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile.prod
+    container_name: backend_youtube_free_anime
+    expose:
+      - "9000"
+    volumes:
+      - ./backend:/var/www
+    depends_on:
+      - db_youtube_free_anime
+    restart: unless-stopped
+    networks:
+      - youtube_free_anime_network
+
+  python_youtube_free_anime:
+    build:
+      context: .
+      dockerfile: docker/python/Dockerfile.prod
+    container_name: python_youtube_free_anime
+    working_dir: /app
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
+      - PYTHON_INTERNAL_API_TOKEN=${PYTHON_INTERNAL_API_TOKEN}
+      - LARAVEL_API_URL=${LARAVEL_API_URL}
+    depends_on:
+      - db_youtube_free_anime
+      - backend_youtube_free_anime
+
+    tty: true
+    restart: unless-stopped
+    networks:
+      - youtube_free_anime_network
+
+  db_youtube_free_anime:
+    image: postgres:16
+    container_name: db_youtube_free_anime
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_youtube_free_anime_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5434:5432"
+    restart: unless-stopped
+    networks:
+      - youtube_free_anime_network
+
+  nginx_youtube_free_anime:
+    image: nginx:1.29
+    container_name: nginx_youtube_free_anime
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/templates/default.conf.template
+      - ./backend/public:/var/www/public
+      - ./logs/nginx:/var/log/nginx/daily
+    environment:
+      - CSP_SCRIPT_SRC='self'
+      - NGINX_ENVSUBST_FILTER=CSP_SCRIPT_SRC
+    depends_on:
+      - frontend_youtube_free_anime
+      - backend_youtube_free_anime
+    restart: unless-stopped
+    networks:
+      - youtube_free_anime_network
+
+volumes:
+  db_youtube_free_anime_data:
+
+networks:
+  youtube_free_anime_network:
+    driver: bridge

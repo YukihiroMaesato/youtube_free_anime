@@ -69,7 +69,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./docker/nginx/default.conf:/etc/nginx/templates/default.conf.template
+      - ./docker/nginx/prod/default.conf:/etc/nginx/templates/default.conf.template
       - ./logs/nginx:/var/log/nginx/daily
       - certbot_etc:/etc/letsencrypt
       - certbot_var:/var/www/certbot

@@ -71,7 +71,7 @@ services:
       - "81:80"
       - "443:443"
     volumes:
-      - ./docker/nginx/default.conf:/etc/nginx/templates/default.conf.template
+      - ./docker/nginx/dev/default.conf:/etc/nginx/templates/default.conf.template
       - ./backend/public:/var/www/public
       - ./logs/nginx:/var/log/nginx/daily
     environment:

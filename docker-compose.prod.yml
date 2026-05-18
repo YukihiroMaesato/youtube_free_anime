@@ -94,6 +94,31 @@ services:
     networks:
       - youtube_free_anime_network
 
+  ofelia_youtube_free_anime:
+    image: mcuadros/ofelia:latest
+    container_name: ofelia_youtube_free_anime
+    depends_on:
+      - python_youtube_free_anime
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      # --------------------------------------------------
+      # データ取得
+      # --------------------------------------------------
+      ofelia.job-exec.job_file_a.schedule: "@every 8h"
+      ofelia.job-exec.job_file_a.container: "python_youtube_free_anime"
+      ofelia.job-exec.job_file_a.command: "python main.py"
+
+      # --------------------------------------------------
+      # 論理削除
+      # --------------------------------------------------
+      ofelia.job-exec.job_file_b.schedule: "@every 24h"
+      ofelia.job-exec.job_file_b.container: "python_youtube_free_anime"
+      ofelia.job-exec.job_file_b.command: "python /api/post_soft_delete.py"
+
+    networks:
+      - youtube_free_anime_network
+
 volumes:
   db_youtube_free_anime_data:
   certbot_etc:

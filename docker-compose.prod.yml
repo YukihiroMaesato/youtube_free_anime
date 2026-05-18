@@ -72,7 +72,7 @@ services:
       - ./docker/nginx/default.conf:/etc/nginx/templates/default.conf.template
       - ./logs/nginx:/var/log/nginx/daily
     environment:
-      - CSP_SCRIPT_SRC='self'
+      - CSP_SCRIPT_SRC='unsafe-inline'
       - NGINX_ENVSUBST_FILTER=CSP_SCRIPT_SRC
     depends_on:
       - frontend_youtube_free_anime

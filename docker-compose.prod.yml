@@ -71,6 +71,8 @@ services:
     volumes:
       - ./docker/nginx/default.conf:/etc/nginx/templates/default.conf.template
       - ./logs/nginx:/var/log/nginx/daily
+      - certbot_etc:/etc/letsencrypt
+      - certbot_var:/var/www/certbot
     environment:
       - CSP_SCRIPT_SRC='unsafe-inline'
       - NGINX_ENVSUBST_FILTER=CSP_SCRIPT_SRC
@@ -81,8 +83,21 @@ services:
     networks:
       - youtube_free_anime_network
 
+  certbot_youtube_free_anime:
+    image: certbot/certbot:latest
+    container_name: certbot_youtube_free_anime
+    volumes:
+      - certbot_etc:/etc/letsencrypt
+      - certbot_var:/var/www/certbot
+    # 12日ごとに自動で更新チェックを走らせる設定
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12d; done;'"
+    networks:
+      - youtube_free_anime_network
+
 volumes:
   db_youtube_free_anime_data:
+  certbot_etc:
+  certbot_var:
 
 networks:
   youtube_free_anime_network:

@@ -94,6 +94,8 @@ def process_channel(channel: dict, video_ids: set) -> None:
 
 def main() -> None:
     try:
+        logger.info("処理開始 main")
+        
         channels = get_videos_with_channels()
 
         video_ids = set()

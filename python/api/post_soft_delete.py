@@ -12,6 +12,8 @@ load_dotenv()
 
 def soft_delete_videos() -> dict:
     try:
+        logger.info("soft_delete_videos 開始")
+        
         headers = {
             "X-Internal-Token": os.getenv("PYTHON_INTERNAL_API_TOKEN"),
             "Content-Type": "application/json",
@@ -29,6 +31,7 @@ def soft_delete_videos() -> dict:
         response = requests.post(
             url,
             headers=headers,
+            allow_redirects=False,
             timeout=30
         )
 

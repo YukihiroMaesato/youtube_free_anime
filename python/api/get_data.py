@@ -15,11 +15,12 @@ def get_videos_with_channels()-> dict | None:
     try:
         response = requests.get(
             url,
-            headers=headers
+            headers=headers,
+            allow_redirects=False
         )
 
         response.raise_for_status()
-
+        
         # JSONデータをパースして返す
         return response.json()
 

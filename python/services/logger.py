@@ -50,3 +50,5 @@ def _create_logger() -> logging.Logger:
 
 
 logger = _create_logger()
+
+logger.setLevel(logging.INFO)

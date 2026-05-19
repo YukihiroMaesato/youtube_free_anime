@@ -16,5 +16,6 @@ def post_videos_bulk(videos: list[dict]) -> None:
   response = requests.post(
       url,
       json=videos,
+      allow_redirects=False,
       headers=headers
   )

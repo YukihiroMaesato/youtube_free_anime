@@ -97,6 +97,7 @@ services:
   ofelia_youtube_free_anime:
     image: mcuadros/ofelia:latest
     container_name: ofelia_youtube_free_anime
+    command: daemon --docker
     depends_on:
       - python_youtube_free_anime
     volumes:
@@ -115,7 +116,7 @@ services:
       ofelia.job-exec.job_file_b.schedule: "@every 24h"
       ofelia.job-exec.job_file_b.container: "python_youtube_free_anime"
       ofelia.job-exec.job_file_b.command: "python /app/api/post_soft_delete.py"
-
+    restart: unless-stopped
     networks:
       - youtube_free_anime_network
 

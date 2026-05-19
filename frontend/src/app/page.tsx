@@ -45,6 +45,8 @@ type AnimeTitleOption = {
   videos_count: number;
 };
 
+type SortKey = 'newest' | 'ending_soon';
+
 function formatDate(value: string | null) {
   if (!value) {
     return null;
@@ -215,6 +217,7 @@ export default function Home() {
   const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
   const [selectedTitle, setSelectedTitle] = useState<AnimeTitleOption | null>(null);
   const [titleSearch, setTitleSearch] = useState('');
+  const [sort, setSort] = useState<SortKey>('newest');
   const [page, setPage] = useState(1);
   const [isUrlFilterReady, setIsUrlFilterReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -292,6 +295,7 @@ export default function Home() {
 
     const params = new URLSearchParams({
       page: String(page),
+      sort,
     });
 
     if (selectedTagId) {
@@ -323,7 +327,7 @@ export default function Home() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [page, selectedTagId, selectedTitle, isUrlFilterReady]);
+  }, [page, selectedTagId, selectedTitle, sort, isUrlFilterReady]);
 
   function selectTag(tagId: number | null) {
     stopAllYoutubeVideos();
@@ -340,6 +344,12 @@ export default function Home() {
     if (!title && typeof window !== 'undefined') {
       window.history.replaceState(null, '', window.location.pathname);
     }
+  }
+
+  function selectSort(nextSort: SortKey) {
+    stopAllYoutubeVideos();
+    setSort(nextSort);
+    setPage(1);
   }
 
   return (
@@ -457,12 +467,36 @@ export default function Home() {
               )}
             </div>
 
-            <Link
-              className="w-fit shrink-0 rounded-full border border-sky-200 bg-sky-50 px-4 py-2 text-sm text-sky-700 shadow-sm hover:border-sky-400"
-              href="/titles"
-            >
-              タイトル一覧
-            </Link>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                className={`rounded-full border px-4 py-2 text-sm shadow-sm ${
+                  sort === 'newest'
+                    ? 'border-emerald-600 bg-emerald-600 text-white'
+                    : 'border-sky-200 bg-sky-50 text-sky-700 hover:border-sky-400'
+                }`}
+                onClick={() => selectSort('newest')}
+              >
+                新着順
+              </button>
+              <button
+                type="button"
+                className={`rounded-full border px-4 py-2 text-sm shadow-sm ${
+                  sort === 'ending_soon'
+                    ? 'border-emerald-600 bg-emerald-600 text-white'
+                    : 'border-sky-200 bg-sky-50 text-sky-700 hover:border-sky-400'
+                }`}
+                onClick={() => selectSort('ending_soon')}
+              >
+                公開終了間近
+              </button>
+              <Link
+                className="w-fit shrink-0 rounded-full border border-sky-200 bg-sky-50 px-4 py-2 text-sm text-sky-700 shadow-sm hover:border-sky-400"
+                href="/titles"
+              >
+                タイトル一覧
+              </Link>
+            </div>
           </div>
         </header>
 

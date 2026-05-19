@@ -15,8 +15,7 @@ class VideoController extends Controller
     {
         $validated = $request->validated();
 
-        $query = Video::with(['animeTitle', 'youtubeChannel'])
-            ->orderByDesc('published_at');
+        $query = Video::with(['animeTitle', 'youtubeChannel']);
 
         if (!empty($validated['video_type'])) {
             $query->where('video_type', $validated['video_type']);
@@ -30,6 +29,15 @@ class VideoController extends Controller
 
         if (!empty($validated['anime_title_id'])) {
             $query->where('anime_title_id', $validated['anime_title_id']);
+        }
+
+        if (($validated['sort'] ?? 'newest') === 'ending_soon') {
+            $query
+                ->orderByRaw('free_until_at IS NULL')
+                ->orderBy('free_until_at')
+                ->orderByDesc('published_at');
+        } else {
+            $query->orderByDesc('published_at');
         }
 
         $videos = $query->paginate(20)

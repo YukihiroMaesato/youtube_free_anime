@@ -18,6 +18,7 @@ class VideoIndexRequest extends FormRequest
             'tag_id' => ['sometimes', 'integer', 'exists:tags,id'],
             'anime_title_id' => ['sometimes', 'integer', 'exists:anime_titles,id'],
             'video_type' => ['sometimes', 'string', 'max:50'],
+            'sort' => ['sometimes', 'string', 'in:newest,ending_soon'],
         ];
     }
 }

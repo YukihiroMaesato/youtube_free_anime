@@ -10,7 +10,7 @@ class RSSFetchError(Exception):
 
 def fetch_youtube_rss(feed_url: str):
     headers = {
-        "User-Agent": "Mozilla/5.0"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
 
     response = requests.get(
@@ -19,7 +19,7 @@ def fetch_youtube_rss(feed_url: str):
         timeout=30
     )
 
-    if response.status_code in (404, 500):
+    if response.status_code != 200:
         raise RSSFetchError(response.status_code, feed_url)
 
     feed = feedparser.parse(response.text)

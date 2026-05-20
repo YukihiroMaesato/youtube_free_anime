@@ -68,19 +68,6 @@ def process_channel(channel: dict, video_ids: set) -> None:
         if len(parsed_videos) == 0:
             return
 
-        first = parsed_videos[0]
-
-        channel_data = {
-            "youtube_channel_id": channel_id,
-            "name": first.get("channel_name", ""),
-            "url": first.get(
-                "channel_url",
-                f"https://www.youtube.com/channel/{channel_id}"
-            ),
-            "is_official": channel.get("is_official", True),
-            "country_code": channel.get("country_code"),
-        }
-
         parsed_videos = add_video_durations(parsed_videos)
 
         post_videos_bulk(parsed_videos)

@@ -109,6 +109,8 @@ services:
       ofelia.job-exec.job_file_a.schedule: "@every 8h"
       ofelia.job-exec.job_file_a.container: "python_youtube_free_anime"
       ofelia.job-exec.job_file_a.command: "python /app/main.py"
+      # 処理が長引いてもOfeliaに強制終了させない
+      ofelia.job-exec.job_file_a.timeout: "2h"
 
       # --------------------------------------------------
       # 論理削除
@@ -116,6 +118,8 @@ services:
       ofelia.job-exec.job_file_b.schedule: "@every 24h"
       ofelia.job-exec.job_file_b.container: "python_youtube_free_anime"
       ofelia.job-exec.job_file_b.command: "python /app/api/post_soft_delete.py"
+      # 処理が長引いてもOfeliaに強制終了させない
+      ofelia.job-exec.job_file_b.timeout: "2h"
     restart: unless-stopped
     networks:
       - youtube_free_anime_network

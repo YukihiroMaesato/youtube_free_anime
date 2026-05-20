@@ -92,7 +92,7 @@ class VideoController extends Controller
         $savedCount  = 0;
         $errorVideos = [];
 
-        Log::error('[VideoController::bulkStore] データ受信', ['count' => count($videos)]);
+        Log::info('[VideoController::bulkStore] データ受信', ['count' => count($videos)]);
 
         foreach ($videos as $data) {
             try {

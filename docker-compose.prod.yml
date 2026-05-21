@@ -117,7 +117,7 @@ services:
       # --------------------------------------------------
       ofelia.job-exec.job_file_b.schedule: "@every 24h"
       ofelia.job-exec.job_file_b.container: "python_youtube_free_anime"
-      ofelia.job-exec.job_file_b.command: "python /app/api/post_soft_delete.py"
+      ofelia.job-exec.job_file_b.command: "python -m api.post_soft_delete"
       # 処理が長引いてもOfeliaに強制終了させない
       ofelia.job-exec.job_file_b.timeout: "2h"
     restart: unless-stopped

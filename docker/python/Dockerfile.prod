@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN useradd -m appuser
+# appuserを作成し、同時に主要グループを root (g=0) に指定する
+RUN useradd -m -g root appuser
 
 COPY ./python/requirements.txt /app/requirements.txt
 
@@ -19,6 +20,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY ./python /app
 
-RUN chown -R appuser:appuser /app
+# /app 以下の「グループ権限」にも書き込み権限（g+w）を与える
+RUN chown -R appuser:root /app && \
+    chmod -R 775 /app
 
 USER appuser

@@ -1,3 +1,8 @@
+import os
+
+# これからこのプログラムが作るファイルやフォルダの権限を「グループ内共有（775 / 664）」にする
+os.umask(002)
+
 import logging
 import os
 from datetime import datetime

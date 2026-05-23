@@ -1,11 +1,9 @@
 import os
-
-# これからこのプログラムが作るファイルやフォルダの権限を「グループ内共有（775 / 664）」にする
-os.umask(0o002)
-
 import logging
 from datetime import datetime
 
+# これからこのプログラムが作るファイルやフォルダの権限を「グループ内共有（775 / 664）」にする
+os.umask(0o002)
 
 def _create_log_dir() -> str:
     now = datetime.now()

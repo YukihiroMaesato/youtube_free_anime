@@ -1,7 +1,7 @@
 import os
 
 # これからこのプログラムが作るファイルやフォルダの権限を「グループ内共有（775 / 664）」にする
-os.umask(002)
+os.umask(0o002)
 
 import logging
 import os
@@ -14,7 +14,7 @@ def _create_log_dir() -> str:
     year = now.strftime("%Y")
     month = now.strftime("%m")
 
-    log_dir = os.path.join("logs", year, month)
+    log_dir = os.path.join("/app/logs", year, month)
 
     os.makedirs(log_dir, exist_ok=True)
 

@@ -4,7 +4,6 @@ import os
 os.umask(0o002)
 
 import logging
-import os
 from datetime import datetime
 
 

@@ -5,13 +5,65 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://simpletk202.com";
+const siteName = "わくわくアニメ巡礼、推しアニ見っけ！";
+const siteDescription =
+  "YouTubeで無料公開されているアニメ動画を、タグ・タイトル・公開終了日から探しやすくまとめるサイトです。";
 
 export const metadata: Metadata = {
-  title: "わくわくアニメ巡礼、推しアニ見っけ！",
-  description:
-    "YouTubeで無料公開されているアニメ動画を探しやすくまとめるサイトです。",
+  metadataBase: new URL(siteUrl),
+  applicationName: siteName,
+  title: {
+    default: siteName,
+    template: `%s | ${siteName}`,
+  },
+  description: siteDescription,
+  keywords: [
+    "無料アニメ",
+    "YouTube アニメ",
+    "期間限定 アニメ",
+    "公式アニメ",
+    "アニメ配信",
+  ],
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "ja_JP",
+    url: "/",
+    siteName,
+    title: siteName,
+    description: siteDescription,
+    images: [
+      {
+        url: "/background/title.png",
+        width: 3721,
+        height: 268,
+        alt: siteName,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteName,
+    description: siteDescription,
+    images: ["/background/title.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   icons: {
     icon: "/favicon/title_icon.png",
+    apple: "/favicon/title_icon.png",
   },
 };
 
@@ -25,10 +77,22 @@ export default function RootLayout({
   const isGAEnabled =
     process.env.NODE_ENV === "production" &&
     !!gaId;
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: siteName,
+    url: siteUrl,
+    description: siteDescription,
+    inLanguage: "ja",
+  };
 
   return (
     <html lang="ja">
       <body className={inter.className}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         <div className="min-h-screen">
           {children}
 

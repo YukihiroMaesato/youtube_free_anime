@@ -74,7 +74,7 @@ services:
       - certbot_etc:/etc/letsencrypt
       - certbot_var:/var/www/certbot
     environment:
-      - CSP_SCRIPT_SRC='unsafe-inline'
+      - CSP_SCRIPT_SRC='unsafe-inline' 'unsafe-eval'
       - NGINX_ENVSUBST_FILTER=CSP_SCRIPT_SRC
     depends_on:
       - frontend_youtube_free_anime
